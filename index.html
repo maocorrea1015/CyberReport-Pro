@@ -17,7 +17,6 @@
       overflow-x: hidden;
     }
 
-    /* Scrollbar personalizada */
     ::-webkit-scrollbar {
       width: 8px;
       height: 8px;
@@ -33,7 +32,6 @@
       background: #5b6e8c;
     }
 
-    /* Animaciones suaves */
     button, input, textarea, select {
       transition: all 0.2s ease;
     }
@@ -42,7 +40,6 @@
       transform: scale(0.97);
     }
 
-    /* Estilos para el modo impresión (PDF) */
     @media print {
       body * {
         visibility: hidden !important;
@@ -90,26 +87,25 @@
     let nextFindingId = 2;
     const mkFinding = () => ({ id: nextFindingId++, title: "", risk: "High", description: "", impact: "", recommendation: "" });
     const initForm = () => ({
-      projectName: "",
-      target: "",
-      analyst: "",
+      projectName: "Auditoría de Seguridad - Router ISP",
+      target: "[IP ANONIMIZADA]",
+      analyst: "Security Analyst",
       date: new Date().toISOString().split("T")[0],
-      scope: "",
-      tools: "",
-      executiveSummary: "",
-      findings: [{ id: 1, title: "", risk: "High", description: "", impact: "", recommendation: "" }],
+      scope: "Análisis de superficie de ataque en dispositivo de borde de red. Se evaluaron puertos expuestos, servicios activos y configuraciones de seguridad.",
+      tools: "Nmap, Nikto, OpenVAS, Manual Review",
+      executiveSummary: "Se identificaron 3 servicios expuestos, incluyendo PPTP (obsoleto), Cisco SCCP y un servicio desconocido en puerto 8291 (posiblemente MikroTik). Se recomienda migrar a VPN moderna, restringir acceso administrativo y deshabilitar protocolos inseguros.",
+      findings: [
+        { id: 1, title: "PPTP VPN expuesto en puerto 1723", risk: "High", description: "El protocolo PPTP utiliza MS-CHAPv2, el cual tiene vulnerabilidades conocidas que permiten el descifrado de credenciales.", impact: "Un atacante podría interceptar tráfico VPN y obtener credenciales de acceso a la red interna.", recommendation: "Migrar a WireGuard o IPsec IKEv2. Deshabilitar PPTP en el firewall." },
+      ],
     });
 
-    // ═══════════════════════════════════════════════════════════════════════════════
-    //  UTILIDADES
-    // ═══════════════════════════════════════════════════════════════════════════════
     function showToast(message, duration = 2500) {
       const event = new CustomEvent('showToast', { detail: { message, duration } });
       window.dispatchEvent(event);
     }
 
     // ═══════════════════════════════════════════════════════════════════════════════
-    //  COMPONENTE: LOGIN PAGE
+    //  LOGIN PAGE
     // ═══════════════════════════════════════════════════════════════════════════════
     function renderLoginPage(onLogin) {
       let state = { username: "", password: "", error: "", busy: false };
@@ -130,11 +126,7 @@
               <h1 style="color: #f1f5f9; margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.02em;">CyberReport Pro</h1>
               <p style="color: #64748b; margin: 8px 0 0; font-size: 14px;">Professional Cybersecurity Audit Platform</p>
             </div>
-            ${state.error ? `
-              <div style="background: #450a0a; border: 1px solid #dc2626; border-radius: 10px; padding: 12px 16px; color: #fca5a5; font-size: 13px; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
-                <span>⚠️</span> ${state.error}
-              </div>
-            ` : ''}
+            ${state.error ? `<div style="background: #450a0a; border: 1px solid #dc2626; border-radius: 10px; padding: 12px 16px; color: #fca5a5; font-size: 13px; margin-bottom: 20px;"><span>⚠️</span> ${state.error}</div>` : ''}
             <div style="margin-bottom: 16px;">
               <label style="color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; display: block; margin-bottom: 6px;">Username</label>
               <input type="text" id="login-username" value="${state.username.replace(/"/g, '&quot;')}" placeholder="analyst" style="width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px 14px; color: #f1f5f9; font-size: 14px; outline: none; box-sizing: border-box;">
@@ -143,9 +135,7 @@
               <label style="color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; display: block; margin-bottom: 6px;">Password</label>
               <input type="password" id="login-password" value="${state.password.replace(/"/g, '&quot;')}" placeholder="••••••••" style="width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px 14px; color: #f1f5f9; font-size: 14px; outline: none; box-sizing: border-box;">
             </div>
-            <button id="login-btn" style="width: 100%; background: ${state.busy ? '#334155' : 'linear-gradient(135deg,#3b82f6,#8b5cf6)'}; border: none; border-radius: 10px; padding: 13px; color: #fff; font-size: 15px; font-weight: 700; cursor: ${state.busy ? 'default' : 'pointer'};">
-              ${state.busy ? 'Authenticating…' : 'Sign In →'}
-            </button>
+            <button id="login-btn" style="width: 100%; background: ${state.busy ? '#334155' : 'linear-gradient(135deg,#3b82f6,#8b5cf6)'}; border: none; border-radius: 10px; padding: 13px; color: #fff; font-size: 15px; font-weight: 700; cursor: ${state.busy ? 'default' : 'pointer'};">${state.busy ? 'Authenticating…' : 'Sign In →'}</button>
             <div style="margin-top: 22px; background: #0f172a; border-radius: 10px; padding: 12px 16px; text-align: center; border: 1px solid #1e3a5f;">
               <p style="color: #475569; font-size: 12px; margin: 0;">Demo credentials: <span style="color: #60a5fa; font-weight: 700;">analyst</span> / <span style="color: #60a5fa; font-weight: 700;">Cyber@2024</span></p>
             </div>
@@ -189,267 +179,8 @@
     }
 
     // ═══════════════════════════════════════════════════════════════════════════════
-    //  COMPONENTES PRINCIPALES (DASHBOARD, FORM, PREVIEW)
+    //  DASHBOARD (con corrección de foco)
     // ═══════════════════════════════════════════════════════════════════════════════
-    let currentForm = initForm();
-    let currentTab = "form";
-    let pendingPrint = false;
-
-    function renderFindingCard(finding, index, total, onChange, onRemove) {
-      const riskMeta = RM[finding.risk];
-      const div = document.createElement('div');
-      div.style.cssText = `background: #1e293b; border: 1px solid ${riskMeta.border}; border-radius: 12px; padding: 24px; margin-bottom: 16px; transition: border-color .2s;`;
-      
-      div.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-          <div style="display: flex; gap: 10px; align-items: center;">
-            <span style="width: 30px; height: 30px; background: ${riskMeta.c}20; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; color: ${riskMeta.c}; font-weight: 800; font-size: 14px; border: 1px solid ${riskMeta.border};">${index + 1}</span>
-            <span style="color: #94a3b8; font-size: 13px; font-weight: 600;">Finding #${index + 1}</span>
-          </div>
-          <div style="display: flex; gap: 8px; align-items: center;">
-            <select class="finding-risk-select" data-id="${finding.id}" style="background: ${riskMeta.bg}; border: 1px solid ${riskMeta.c}70; border-radius: 8px; padding: 6px 12px; color: ${riskMeta.c}; font-size: 13px; font-weight: 700; cursor: pointer;">
-              ${RISKS.map(r => `<option value="${r}" ${finding.risk === r ? 'selected' : ''}>${r}</option>`).join('')}
-            </select>
-            ${total > 1 ? `<button class="finding-remove-btn" data-id="${finding.id}" style="background: #450a0a; border: 1px solid #dc2626; border-radius: 8px; padding: 6px 12px; color: #fca5a5; font-size: 12px; cursor: pointer; font-weight: 600;">✕ Remove</button>` : ''}
-          </div>
-        </div>
-        <div style="display: grid; gap: 12px;">
-          <div>
-            <label style="color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; display: block; margin-bottom: 6px;">Finding Title</label>
-            <input class="finding-title" data-id="${finding.id}" value="${finding.title.replace(/"/g, '&quot;')}" placeholder="e.g., SQL Injection in Login Form" style="width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px 14px; color: #f1f5f9; font-size: 14px; outline: none; box-sizing: border-box;">
-          </div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-            <div>
-              <label style="color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; display: block; margin-bottom: 6px;">Description</label>
-              <textarea class="finding-desc" data-id="${finding.id}" placeholder="Describe the vulnerability in detail…" rows="4" style="width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px 14px; color: #f1f5f9; font-size: 14px; outline: none; resize: vertical; box-sizing: border-box;">${finding.description.replace(/"/g, '&quot;')}</textarea>
-            </div>
-            <div>
-              <label style="color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; display: block; margin-bottom: 6px;">Business Impact</label>
-              <textarea class="finding-impact" data-id="${finding.id}" placeholder="Potential business / security impact…" rows="4" style="width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px 14px; color: #f1f5f9; font-size: 14px; outline: none; resize: vertical; box-sizing: border-box;">${finding.impact.replace(/"/g, '&quot;')}</textarea>
-            </div>
-          </div>
-          <div>
-            <label style="color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; display: block; margin-bottom: 6px;">Recommendation</label>
-            <textarea class="finding-recomm" data-id="${finding.id}" placeholder="Steps to remediate this vulnerability…" rows="3" style="width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px 14px; color: #f1f5f9; font-size: 14px; outline: none; resize: vertical; box-sizing: border-box;">${finding.recommendation.replace(/"/g, '&quot;')}</textarea>
-          </div>
-        </div>
-      `;
-
-      // Event listeners
-      div.querySelector('.finding-risk-select').addEventListener('change', (e) => {
-        onChange({ ...finding, risk: e.target.value });
-      });
-      div.querySelector('.finding-title').addEventListener('input', (e) => {
-        onChange({ ...finding, title: e.target.value });
-      });
-      div.querySelector('.finding-desc').addEventListener('input', (e) => {
-        onChange({ ...finding, description: e.target.value });
-      });
-      div.querySelector('.finding-impact').addEventListener('input', (e) => {
-        onChange({ ...finding, impact: e.target.value });
-      });
-      div.querySelector('.finding-recomm').addEventListener('input', (e) => {
-        onChange({ ...finding, recommendation: e.target.value });
-      });
-      const removeBtn = div.querySelector('.finding-remove-btn');
-      if (removeBtn) removeBtn.onclick = () => onRemove(finding.id);
-
-      return div;
-    }
-
-    function renderFormSection(form, onFormChange) {
-      const container = document.createElement('div');
-      
-      const riskCounts = RISKS.reduce((acc, r) => ({ ...acc, [r]: form.findings.filter(f => f.risk === r).length }), {});
-
-      const updateField = (key, value) => {
-        onFormChange({ ...form, [key]: value });
-      };
-
-      const updateFinding = (updatedFinding) => {
-        onFormChange({
-          ...form,
-          findings: form.findings.map(f => f.id === updatedFinding.id ? updatedFinding : f)
-        });
-      };
-
-      const addFinding = () => {
-        onFormChange({
-          ...form,
-          findings: [...form.findings, mkFinding()]
-        });
-      };
-
-      const removeFinding = (id) => {
-        if (form.findings.length === 1) return;
-        onFormChange({
-          ...form,
-          findings: form.findings.filter(f => f.id !== id)
-        });
-      };
-
-      const render = () => {
-        container.innerHTML = `
-          <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
-            ${RISKS.filter(r => riskCounts[r] > 0).map(r => `
-              <div style="background: ${RM[r].bg}; border: 1px solid ${RM[r].border}; border-radius: 8px; padding: 6px 14px; display: flex; align-items: center; gap: 6px;">
-                <span style="color: ${RM[r].c}; font-weight: 700; font-size: 13px;">${riskCounts[r]} ${r}</span>
-              </div>
-            `).join('')}
-            <div style="background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 6px 14px;">
-              <span style="color: #94a3b8; font-size: 13px; font-weight: 600;">${form.findings.length} Total Findings</span>
-            </div>
-          </div>
-
-          <div style="background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
-            <h2 style="color: #f1f5f9; margin: 0 0 20px; font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px;">📋 <span>Project Information</span></h2>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-              <div><label style="color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; display: block; margin-bottom: 6px;">Project Name</label><input id="f-projectName" value="${form.projectName.replace(/"/g, '&quot;')}" placeholder="e.g., Web App Security Audit Q4 2024" style="width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px 14px; color: #f1f5f9; font-size: 14px; outline: none; box-sizing: border-box;"></div>
-              <div><label style="color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; display: block; margin-bottom: 6px;">Target (IP / Domain)</label><input id="f-target" value="${form.target.replace(/"/g, '&quot;')}" placeholder="e.g., 192.168.1.0/24 or app.example.com" style="width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px 14px; color: #f1f5f9; font-size: 14px; outline: none; box-sizing: border-box;"></div>
-              <div><label style="color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; display: block; margin-bottom: 6px;">Analyst Name</label><input id="f-analyst" value="${form.analyst.replace(/"/g, '&quot;')}" placeholder="e.g., Jane Smith, OSCP" style="width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px 14px; color: #f1f5f9; font-size: 14px; outline: none; box-sizing: border-box;"></div>
-              <div><label style="color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; display: block; margin-bottom: 6px;">Audit Date</label><input id="f-date" type="date" value="${form.date}" style="width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px 14px; color: #f1f5f9; font-size: 14px; outline: none; box-sizing: border-box;"></div>
-              <div style="grid-column: span 2;"><label style="color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; display: block; margin-bottom: 6px;">Audit Scope</label><textarea id="f-scope" rows="3" placeholder="Define scope: systems, apps, IPs, networks, methodologies…" style="width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px 14px; color: #f1f5f9; font-size: 14px; outline: none; resize: vertical; box-sizing: border-box;">${form.scope.replace(/"/g, '&quot;')}</textarea></div>
-              <div style="grid-column: span 2;"><label style="color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; display: block; margin-bottom: 6px;">Tools Used (comma-separated)</label><textarea id="f-tools" rows="2" placeholder="e.g., Nmap, Burp Suite, Metasploit, OWASP ZAP, Nikto" style="width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px 14px; color: #f1f5f9; font-size: 14px; outline: none; resize: vertical; box-sizing: border-box;">${form.tools.replace(/"/g, '&quot;')}</textarea></div>
-              <div style="grid-column: span 2;"><label style="color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; display: block; margin-bottom: 6px;">Executive Summary</label><textarea id="f-summary" rows="5" placeholder="Write a concise summary of the overall security posture, key findings, and recommended actions…" style="width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px 14px; color: #f1f5f9; font-size: 14px; outline: none; resize: vertical; box-sizing: border-box;">${form.executiveSummary.replace(/"/g, '&quot;')}</textarea></div>
-            </div>
-          </div>
-
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-            <h2 style="color: #f1f5f9; margin: 0; font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px;">🔍 <span>Findings</span><span style="background: #334155; border-radius: 20px; padding: 2px 10px; font-size: 13px; color: #94a3b8; font-weight: 700;">${form.findings.length}</span></h2>
-            <button id="add-finding-btn" style="background: linear-gradient(135deg,#3b82f6,#8b5cf6); border: none; border-radius: 8px; padding: 9px 20px; color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px;">+ Add Finding</button>
-          </div>
-          <div id="findings-list"></div>
-        `;
-
-        const findingsContainer = container.querySelector('#findings-list');
-        const renderFindings = () => {
-          findingsContainer.innerHTML = '';
-          form.findings.forEach((f, idx) => {
-            findingsContainer.appendChild(renderFindingCard(f, idx, form.findings.length, updateFinding, removeFinding));
-          });
-        };
-        renderFindings();
-
-        // Bind inputs
-        container.querySelector('#f-projectName').addEventListener('input', (e) => updateField('projectName', e.target.value));
-        container.querySelector('#f-target').addEventListener('input', (e) => updateField('target', e.target.value));
-        container.querySelector('#f-analyst').addEventListener('input', (e) => updateField('analyst', e.target.value));
-        container.querySelector('#f-date').addEventListener('change', (e) => updateField('date', e.target.value));
-        container.querySelector('#f-scope').addEventListener('input', (e) => updateField('scope', e.target.value));
-        container.querySelector('#f-tools').addEventListener('input', (e) => updateField('tools', e.target.value));
-        container.querySelector('#f-summary').addEventListener('input', (e) => updateField('executiveSummary', e.target.value));
-        container.querySelector('#add-finding-btn').onclick = addFinding;
-      };
-
-      render();
-      return container;
-    }
-
-    function renderReportPreview(form) {
-      const riskCounts = RISKS.reduce((acc, r) => ({ ...acc, [r]: form.findings.filter(f => f.risk === r).length }), {});
-      const topRisk = RISKS.find(r => riskCounts[r] > 0) || "Info";
-      const meta = RM[topRisk];
-
-      const div = document.createElement('div');
-      div.id = 'print-report';
-      div.style.cssText = 'background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 40px #00000050; font-family: "Segoe UI",Georgia,system-ui,sans-serif;';
-      
-      div.innerHTML = `
-        <div style="background: linear-gradient(135deg,#0f172a 0%,#1e1b4b 100%); padding: 52px 60px; color: #f1f5f9; position: relative; overflow: hidden;">
-          <div style="position: absolute; top: -40px; right: -40px; width: 200px; height: 200px; background: #3b82f610; border-radius: 50%;"></div>
-          <div style="position: absolute; bottom: -60px; right: 80px; width: 140px; height: 140px; background: #8b5cf610; border-radius: 50%;"></div>
-          <div style="position: relative; display: flex; justify-content: space-between; align-items: flex-start; gap: 24px;">
-            <div style="flex: 1;">
-              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
-                <div style="width: 32px; height: 32px; background: linear-gradient(135deg,#3b82f6,#8b5cf6); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px;">🛡️</div>
-                <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .18em; color: #60a5fa;">Cybersecurity Audit Report — Confidential</span>
-              </div>
-              <h1 style="font-size: 34px; font-weight: 800; margin: 0 0 22px; letter-spacing: -0.02em; line-height: 1.1;">${form.projectName || "Untitled Project"}</h1>
-              <div style="display: flex; gap: 28px; font-size: 14px; flex-wrap: wrap;">
-                ${form.target ? `<div><span style="color: #64748b;">🎯 Target: </span><strong style="color: #e2e8f0;">${form.target}</strong></div>` : ''}
-                ${form.analyst ? `<div><span style="color: #64748b;">👤 Analyst: </span><strong style="color: #e2e8f0;">${form.analyst}</strong></div>` : ''}
-                ${form.date ? `<div><span style="color: #64748b;">📅 Date: </span><strong style="color: #e2e8f0;">${form.date}</strong></div>` : ''}
-              </div>
-            </div>
-            <div style="flex-shrink: 0; text-align: center; background: ${meta.c}18; border: 2px solid ${meta.c}; border-radius: 14px; padding: 18px 30px;">
-              <div style="font-size: 10px; color: #94a3b8; font-weight: 800; text-transform: uppercase; letter-spacing: .12em; margin-bottom: 6px;">Overall Risk</div>
-              <div style="font-size: 28px; font-weight: 900; color: ${meta.c}; letter-spacing: -0.02em;">${topRisk}</div>
-              <div style="font-size: 12px; color: #64748b; margin-top: 6px;">${form.findings.length} finding${form.findings.length !== 1 ? 's' : ''}</div>
-            </div>
-          </div>
-        </div>
-        <div style="padding: 44px 60px; color: #111827;">
-          <div style="display: flex; gap: 10px; margin-bottom: 40px; flex-wrap: wrap; padding-bottom: 28px; border-bottom: 1px solid #f3f4f6;">
-            ${RISKS.filter(r => riskCounts[r] > 0).map(r => `
-              <div style="background: ${RM[r].light}; border: 1px solid ${RM[r].c}50; border-radius: 8px; padding: 7px 16px; display: flex; align-items: center; gap: 7px;">
-                <div style="width: 8px; height: 8px; border-radius: 50%; background: ${RM[r].c};"></div>
-                <span style="font-weight: 700; color: ${RM[r].c}; font-size: 14px;">${riskCounts[r]} ${r}</span>
-              </div>
-            `).join('')}
-            <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 7px 16px;">
-              <span style="font-weight: 700; color: #6b7280; font-size: 14px;">${form.findings.length} Total Findings</span>
-            </div>
-          </div>
-          ${form.executiveSummary ? `
-            <div style="margin-bottom: 32px;">
-              <h2 style="font-size: 18px; font-weight: 700; color: #111827; margin: 0 0 16px; padding-bottom: 12px; border-bottom: 2px solid #e5e7eb; display: flex; align-items: center; gap: 10px;"><span style="background: #1d4ed8; color: #fff; border-radius: 6px; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800;">1</span>Executive Summary</h2>
-              <div style="background: #f8fafc; border-left: 4px solid #3b82f6; border-radius: 0 8px 8px 0; padding: 16px 20px;"><p style="color: #374151; line-height: 1.8; margin: 0; font-size: 15px;">${form.executiveSummary}</p></div>
-            </div>
-          ` : ''}
-          ${(form.scope || form.tools) ? `
-            <div style="margin-bottom: 32px;">
-              <h2 style="font-size: 18px; font-weight: 700; color: #111827; margin: 0 0 16px; padding-bottom: 12px; border-bottom: 2px solid #e5e7eb; display: flex; align-items: center; gap: 10px;"><span style="background: #1d4ed8; color: #fff; border-radius: 6px; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800;">2</span>Scope & Methodology</h2>
-              <div style="display: grid; grid-template-columns: ${form.scope && form.tools ? '1fr 1fr' : '1fr'}; gap: 24px;">
-                ${form.scope ? `<div><h3 style="font-size: 13px; font-weight: 700; color: #374151; margin: 0 0 8px; text-transform: uppercase; letter-spacing: .06em;">Assessment Scope</h3><p style="color: #4b5563; line-height: 1.7; margin: 0; font-size: 14px;">${form.scope}</p></div>` : ''}
-                ${form.tools ? `<div><h3 style="font-size: 13px; font-weight: 700; color: #374151; margin: 0 0 10px; text-transform: uppercase; letter-spacing: .06em;">Tools & Techniques</h3><div style="display: flex; flex-wrap: wrap; gap: 6px;">${form.tools.split(',').map(t => `<span style="background: #dbeafe; color: #1d4ed8; border-radius: 6px; padding: 4px 10px; font-size: 12px; font-weight: 600;">${t.trim()}</span>`).join('')}</div></div>` : ''}
-              </div>
-            </div>
-          ` : ''}
-          <div style="margin-bottom: 32px;">
-            <h2 style="font-size: 18px; font-weight: 700; color: #111827; margin: 0 0 16px; padding-bottom: 12px; border-bottom: 2px solid #e5e7eb; display: flex; align-items: center; gap: 10px;"><span style="background: #1d4ed8; color: #fff; border-radius: 6px; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800;">3</span>Detailed Findings</h2>
-            <div id="findings-preview-list"></div>
-          </div>
-          <div>
-            <h2 style="font-size: 18px; font-weight: 700; color: #111827; margin: 0 0 16px; padding-bottom: 12px; border-bottom: 2px solid #e5e7eb; display: flex; align-items: center; gap: 10px;"><span style="background: #1d4ed8; color: #fff; border-radius: 6px; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800;">4</span>Risk Classification Summary</h2>
-            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-              <thead><tr style="background: #f9fafb;"><th style="padding: 12px 18px; text-align: left; color: #6b7280; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; border-bottom: 2px solid #e5e7eb;">Risk Level</th><th style="padding: 12px 18px; text-align: left; color: #6b7280; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; border-bottom: 2px solid #e5e7eb;">Count</th><th style="padding: 12px 18px; text-align: left; color: #6b7280; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; border-bottom: 2px solid #e5e7eb;">Remediation Timeline</th></tr></thead>
-              <tbody>
-                ${RISKS.map((r, i) => `<tr style="border-bottom: 1px solid #f3f4f6; background: ${i % 2 === 0 ? '#fff' : '#fafafa'};"><td style="padding: 12px 18px;"><span style="background: ${RM[r].light}; color: ${RM[r].c}; border-radius: 6px; padding: 4px 12px; font-size: 13px; font-weight: 700;">${r}</span></td><td style="padding: 12px 18px; font-weight: 800; color: ${riskCounts[r] > 0 ? RM[r].c : '#9ca3af'}; font-size: 20px;">${riskCounts[r]}</td><td style="padding: 12px 18px; color: #6b7280; font-size: 13px;">${RDESC[r]}</td></tr>`).join('')}
-              </tbody>
-            </table>
-          </div>
-          <div style="border-top: 2px solid #e5e7eb; padding-top: 20px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; color: #9ca3af; font-size: 12px;">
-            <span style="font-weight: 700; color: #6b7280;">🛡️ CyberReport Pro</span>
-            <span style="font-style: italic;">CONFIDENTIAL — For Authorized Personnel Only</span>
-            <span>${form.date || new Date().toLocaleDateString()}</span>
-          </div>
-        </div>
-      `;
-
-      const findingsContainer = div.querySelector('#findings-preview-list');
-      if (findingsContainer) {
-        findingsContainer.innerHTML = '';
-        form.findings.forEach((fn, i) => {
-          const m = RM[fn.risk];
-          const findingDiv = document.createElement('div');
-          findingDiv.style.cssText = `border: 1px solid ${m.c}30; border-radius: 10px; overflow: hidden; margin-bottom: 20px;`;
-          findingDiv.innerHTML = `
-            <div style="background: ${m.c}10; border-bottom: 1px solid ${m.c}25; padding: 14px 22px; display: flex; justify-content: space-between; align-items: center;">
-              <div style="display: flex; gap: 12px; align-items: center;"><span style="width: 28px; height: 28px; background: ${m.c}; border-radius: 7px; display: inline-flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; font-weight: 800;">${i+1}</span><span style="font-weight: 700; font-size: 15px; color: #111827;">${fn.title || `Unnamed Finding #${i+1}`}</span></div>
-              <span style="background: ${m.c}; color: #fff; border-radius: 6px; padding: 4px 14px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em;">${fn.risk}</span>
-            </div>
-            <div style="padding: 18px 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; background: #fff;">
-              ${fn.description ? `<div style="grid-column: span 1;"><div style="font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; color: #9ca3af; margin-bottom: 6px;">Description</div><p style="margin: 0; color: #4b5563; font-size: 14px; line-height: 1.7;">${fn.description}</p></div>` : ''}
-              ${fn.impact ? `<div style="grid-column: span 1;"><div style="font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; color: #9ca3af; margin-bottom: 6px;">Business Impact</div><p style="margin: 0; color: #4b5563; font-size: 14px; line-height: 1.7;">${fn.impact}</p></div>` : ''}
-              ${fn.recommendation ? `<div style="grid-column: span 2;"><div style="font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; color: #9ca3af; margin-bottom: 6px;">Recommendation</div><p style="margin: 0; color: #4b5563; font-size: 14px; line-height: 1.7;">${fn.recommendation}</p></div>` : ''}
-            </div>
-          `;
-          findingsContainer.appendChild(findingDiv);
-        });
-      }
-      return div;
-    }
-
     function renderDashboard(username, onLogout) {
       let form = initForm();
       let tab = 'form';
@@ -459,8 +190,279 @@
       appContainer.style.background = '#0f172a';
       appContainer.style.fontFamily = "'Segoe UI',system-ui,sans-serif";
 
-      const render = () => {
+      // Referencias a elementos del DOM para actualización selectiva
+      let mainContent = null;
+      let findingsContainer = null;
+
+      // Función para actualizar SOLO los contadores de estadísticas
+      const updateStatsBar = () => {
         const riskCounts = RISKS.reduce((acc, r) => ({ ...acc, [r]: form.findings.filter(f => f.risk === r).length }), {});
+        const statsBar = document.querySelector('#stats-bar');
+        if (statsBar) {
+          statsBar.innerHTML = `
+            ${RISKS.filter(r => riskCounts[r] > 0).map(r => `
+              <div style="background: ${RM[r].bg}; border: 1px solid ${RM[r].border}; border-radius: 8px; padding: 6px 14px; display: flex; align-items: center; gap: 6px;">
+                <span style="color: ${RM[r].c}; font-weight: 700; font-size: 13px;">${riskCounts[r]} ${r}</span>
+              </div>
+            `).join('')}
+            <div style="background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 6px 14px;">
+              <span style="color: #94a3b8; font-size: 13px; font-weight: 600;">${form.findings.length} Total Findings</span>
+            </div>
+          `;
+        }
+        const findingsCountSpan = document.querySelector('#findings-count');
+        if (findingsCountSpan) {
+          findingsCountSpan.textContent = form.findings.length;
+        }
+      };
+
+      // Actualizar SOLO el valor de un campo específico sin re-renderizar todo
+      const bindFieldUpdates = () => {
+        const fields = ['projectName', 'target', 'analyst', 'date', 'scope', 'tools', 'executiveSummary'];
+        fields.forEach(field => {
+          const el = document.querySelector(`#f-${field}`);
+          if (el && el.value !== form[field]) {
+            el.value = form[field];
+          }
+        });
+      };
+
+      // Renderizar o re-renderizar los hallazgos
+      const renderFindings = () => {
+        findingsContainer = document.querySelector('#findings-list');
+        if (!findingsContainer) return;
+        
+        findingsContainer.innerHTML = '';
+        form.findings.forEach((finding, idx) => {
+          const riskMeta = RM[finding.risk];
+          const cardDiv = document.createElement('div');
+          cardDiv.className = 'finding-card';
+          cardDiv.setAttribute('data-id', finding.id);
+          cardDiv.style.cssText = `background: #1e293b; border: 1px solid ${riskMeta.border}; border-radius: 12px; padding: 24px; margin-bottom: 16px; transition: border-color .2s;`;
+          
+          cardDiv.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <span style="width: 30px; height: 30px; background: ${riskMeta.c}20; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; color: ${riskMeta.c}; font-weight: 800; font-size: 14px; border: 1px solid ${riskMeta.border};">${idx + 1}</span>
+                <span style="color: #94a3b8; font-size: 13px; font-weight: 600;">Finding #${idx + 1}</span>
+              </div>
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <select class="finding-risk-select" data-id="${finding.id}" style="background: ${riskMeta.bg}; border: 1px solid ${riskMeta.c}70; border-radius: 8px; padding: 6px 12px; color: ${riskMeta.c}; font-size: 13px; font-weight: 700; cursor: pointer;">
+                  ${RISKS.map(r => `<option value="${r}" ${finding.risk === r ? 'selected' : ''}>${r}</option>`).join('')}
+                </select>
+                ${form.findings.length > 1 ? `<button class="finding-remove-btn" data-id="${finding.id}" style="background: #450a0a; border: 1px solid #dc2626; border-radius: 8px; padding: 6px 12px; color: #fca5a5; font-size: 12px; cursor: pointer; font-weight: 600;">✕ Remove</button>` : ''}
+              </div>
+            </div>
+            <div style="display: grid; gap: 12px;">
+              <div>
+                <label style="color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; display: block; margin-bottom: 6px;">Finding Title</label>
+                <input class="finding-title" data-id="${finding.id}" value="${finding.title.replace(/"/g, '&quot;')}" placeholder="e.g., SQL Injection in Login Form" style="width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px 14px; color: #f1f5f9; font-size: 14px; outline: none; box-sizing: border-box;">
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div>
+                  <label style="color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; display: block; margin-bottom: 6px;">Description</label>
+                  <textarea class="finding-desc" data-id="${finding.id}" placeholder="Describe the vulnerability in detail…" rows="4" style="width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px 14px; color: #f1f5f9; font-size: 14px; outline: none; resize: vertical; box-sizing: border-box;">${finding.description.replace(/"/g, '&quot;')}</textarea>
+                </div>
+                <div>
+                  <label style="color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; display: block; margin-bottom: 6px;">Business Impact</label>
+                  <textarea class="finding-impact" data-id="${finding.id}" placeholder="Potential business / security impact…" rows="4" style="width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px 14px; color: #f1f5f9; font-size: 14px; outline: none; resize: vertical; box-sizing: border-box;">${finding.impact.replace(/"/g, '&quot;')}</textarea>
+                </div>
+              </div>
+              <div>
+                <label style="color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; display: block; margin-bottom: 6px;">Recommendation</label>
+                <textarea class="finding-recomm" data-id="${finding.id}" placeholder="Steps to remediate this vulnerability…" rows="3" style="width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px 14px; color: #f1f5f9; font-size: 14px; outline: none; resize: vertical; box-sizing: border-box;">${finding.recommendation.replace(/"/g, '&quot;')}</textarea>
+              </div>
+            </div>
+          `;
+
+          // Bind eventos individuales
+          cardDiv.querySelector('.finding-risk-select').addEventListener('change', (e) => {
+            finding.risk = e.target.value;
+            updateStatsBar();
+            // Actualizar el estilo del borde y color
+            const newMeta = RM[finding.risk];
+            cardDiv.style.borderColor = newMeta.border;
+            const headerSpan = cardDiv.querySelector('div > div > span:first-child');
+            if (headerSpan) {
+              headerSpan.style.background = `${newMeta.c}20`;
+              headerSpan.style.color = newMeta.c;
+              headerSpan.style.borderColor = newMeta.border;
+            }
+            const selectEl = cardDiv.querySelector('.finding-risk-select');
+            if (selectEl) {
+              selectEl.style.background = newMeta.bg;
+              selectEl.style.color = newMeta.c;
+              selectEl.style.borderColor = `${newMeta.c}70`;
+            }
+          });
+          
+          cardDiv.querySelector('.finding-title').addEventListener('input', (e) => { finding.title = e.target.value; });
+          cardDiv.querySelector('.finding-desc').addEventListener('input', (e) => { finding.description = e.target.value; });
+          cardDiv.querySelector('.finding-impact').addEventListener('input', (e) => { finding.impact = e.target.value; });
+          cardDiv.querySelector('.finding-recomm').addEventListener('input', (e) => { finding.recommendation = e.target.value; });
+          
+          const removeBtn = cardDiv.querySelector('.finding-remove-btn');
+          if (removeBtn) {
+            removeBtn.onclick = () => {
+              if (form.findings.length === 1) return;
+              form.findings = form.findings.filter(f => f.id !== finding.id);
+              renderFindings();
+              updateStatsBar();
+              showToast("Finding removed");
+            };
+          }
+          
+          findingsContainer.appendChild(cardDiv);
+        });
+      };
+
+      // Renderizar el formulario completo (solo cuando se cambia de tab o reset)
+      const renderFullForm = () => {
+        if (mainContent) {
+          mainContent.innerHTML = `
+            <div id="stats-bar" style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;"></div>
+            <div style="background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+              <h2 style="color: #f1f5f9; margin: 0 0 20px; font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px;">📋 <span>Project Information</span></h2>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div><label style="color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; display: block; margin-bottom: 6px;">Project Name</label><input id="f-projectName" value="${form.projectName.replace(/"/g, '&quot;')}" placeholder="e.g., Web App Security Audit Q4 2024" style="width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px 14px; color: #f1f5f9; font-size: 14px; outline: none; box-sizing: border-box;"></div>
+                <div><label style="color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; display: block; margin-bottom: 6px;">Target (IP / Domain)</label><input id="f-target" value="${form.target.replace(/"/g, '&quot;')}" placeholder="e.g., 192.168.1.0/24 or app.example.com" style="width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px 14px; color: #f1f5f9; font-size: 14px; outline: none; box-sizing: border-box;"></div>
+                <div><label style="color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; display: block; margin-bottom: 6px;">Analyst Name</label><input id="f-analyst" value="${form.analyst.replace(/"/g, '&quot;')}" placeholder="e.g., Jane Smith, OSCP" style="width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px 14px; color: #f1f5f9; font-size: 14px; outline: none; box-sizing: border-box;"></div>
+                <div><label style="color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; display: block; margin-bottom: 6px;">Audit Date</label><input id="f-date" type="date" value="${form.date}" style="width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px 14px; color: #f1f5f9; font-size: 14px; outline: none; box-sizing: border-box;"></div>
+                <div style="grid-column: span 2;"><label style="color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; display: block; margin-bottom: 6px;">Audit Scope</label><textarea id="f-scope" rows="3" placeholder="Define scope: systems, apps, IPs, networks, methodologies…" style="width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px 14px; color: #f1f5f9; font-size: 14px; outline: none; resize: vertical; box-sizing: border-box;">${form.scope.replace(/"/g, '&quot;')}</textarea></div>
+                <div style="grid-column: span 2;"><label style="color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; display: block; margin-bottom: 6px;">Tools Used (comma-separated)</label><textarea id="f-tools" rows="2" placeholder="e.g., Nmap, Burp Suite, Metasploit, OWASP ZAP, Nikto" style="width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px 14px; color: #f1f5f9; font-size: 14px; outline: none; resize: vertical; box-sizing: border-box;">${form.tools.replace(/"/g, '&quot;')}</textarea></div>
+                <div style="grid-column: span 2;"><label style="color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; display: block; margin-bottom: 6px;">Executive Summary</label><textarea id="f-summary" rows="5" placeholder="Write a concise summary of the overall security posture, key findings, and recommended actions…" style="width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px 14px; color: #f1f5f9; font-size: 14px; outline: none; resize: vertical; box-sizing: border-box;">${form.executiveSummary.replace(/"/g, '&quot;')}</textarea></div>
+              </div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <h2 style="color: #f1f5f9; margin: 0; font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px;">🔍 <span>Findings</span><span id="findings-count" style="background: #334155; border-radius: 20px; padding: 2px 10px; font-size: 13px; color: #94a3b8; font-weight: 700;">${form.findings.length}</span></h2>
+              <button id="add-finding-btn" style="background: linear-gradient(135deg,#3b82f6,#8b5cf6); border: none; border-radius: 8px; padding: 9px 20px; color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px;">+ Add Finding</button>
+            </div>
+            <div id="findings-list"></div>
+          `;
+
+          // Bind eventos de los campos del proyecto
+          document.querySelector('#f-projectName')?.addEventListener('input', (e) => { form.projectName = e.target.value; });
+          document.querySelector('#f-target')?.addEventListener('input', (e) => { form.target = e.target.value; });
+          document.querySelector('#f-analyst')?.addEventListener('input', (e) => { form.analyst = e.target.value; });
+          document.querySelector('#f-date')?.addEventListener('change', (e) => { form.date = e.target.value; });
+          document.querySelector('#f-scope')?.addEventListener('input', (e) => { form.scope = e.target.value; });
+          document.querySelector('#f-tools')?.addEventListener('input', (e) => { form.tools = e.target.value; });
+          document.querySelector('#f-summary')?.addEventListener('input', (e) => { form.executiveSummary = e.target.value; });
+          
+          document.querySelector('#add-finding-btn')?.addEventListener('click', () => {
+            form.findings.push(mkFinding());
+            renderFindings();
+            updateStatsBar();
+            showToast("New finding added");
+          });
+
+          renderFindings();
+          updateStatsBar();
+        }
+      };
+
+      const renderPreview = () => {
+        const riskCounts = RISKS.reduce((acc, r) => ({ ...acc, [r]: form.findings.filter(f => f.risk === r).length }), {});
+        const topRisk = RISKS.find(r => riskCounts[r] > 0) || "Info";
+        const meta = RM[topRisk];
+
+        const previewHtml = `
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div><h2 style="color: #f1f5f9; margin: 0; font-size: 16px; font-weight: 700;">📄 Report Preview</h2><p style="color: #64748b; margin: 4px 0 0; font-size: 13px;">This is how your report will look when exported.</p></div>
+            <button id="preview-export-btn" style="background: #16a34a; border: none; border-radius: 8px; padding: 10px 24px; color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px;">📄 Export as PDF</button>
+          </div>
+          <div id="print-report" style="background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 40px #00000050; font-family: 'Segoe UI',Georgia,system-ui,sans-serif;">
+            <div style="background: linear-gradient(135deg,#0f172a 0%,#1e1b4b 100%); padding: 52px 60px; color: #f1f5f9; position: relative;">
+              <div style="position: absolute; top: -40px; right: -40px; width: 200px; height: 200px; background: #3b82f610; border-radius: 50%;"></div>
+              <div style="position: absolute; bottom: -60px; right: 80px; width: 140px; height: 140px; background: #8b5cf610; border-radius: 50%;"></div>
+              <div style="position: relative; display: flex; justify-content: space-between; align-items: flex-start; gap: 24px;">
+                <div style="flex: 1;">
+                  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
+                    <div style="width: 32px; height: 32px; background: linear-gradient(135deg,#3b82f6,#8b5cf6); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px;">🛡️</div>
+                    <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .18em; color: #60a5fa;">Cybersecurity Audit Report — Confidential</span>
+                  </div>
+                  <h1 style="font-size: 34px; font-weight: 800; margin: 0 0 22px; letter-spacing: -0.02em; line-height: 1.1;">${form.projectName || "Untitled Project"}</h1>
+                  <div style="display: flex; gap: 28px; font-size: 14px; flex-wrap: wrap;">
+                    ${form.target ? `<div><span style="color: #64748b;">🎯 Target: </span><strong style="color: #e2e8f0;">${form.target}</strong></div>` : ''}
+                    ${form.analyst ? `<div><span style="color: #64748b;">👤 Analyst: </span><strong style="color: #e2e8f0;">${form.analyst}</strong></div>` : ''}
+                    ${form.date ? `<div><span style="color: #64748b;">📅 Date: </span><strong style="color: #e2e8f0;">${form.date}</strong></div>` : ''}
+                  </div>
+                </div>
+                <div style="flex-shrink: 0; text-align: center; background: ${meta.c}18; border: 2px solid ${meta.c}; border-radius: 14px; padding: 18px 30px;">
+                  <div style="font-size: 10px; color: #94a3b8; font-weight: 800; text-transform: uppercase; letter-spacing: .12em; margin-bottom: 6px;">Overall Risk</div>
+                  <div style="font-size: 28px; font-weight: 900; color: ${meta.c}; letter-spacing: -0.02em;">${topRisk}</div>
+                  <div style="font-size: 12px; color: #64748b; margin-top: 6px;">${form.findings.length} finding${form.findings.length !== 1 ? 's' : ''}</div>
+                </div>
+              </div>
+            </div>
+            <div style="padding: 44px 60px; color: #111827;">
+              <div style="display: flex; gap: 10px; margin-bottom: 40px; flex-wrap: wrap; padding-bottom: 28px; border-bottom: 1px solid #f3f4f6;">
+                ${RISKS.filter(r => riskCounts[r] > 0).map(r => `
+                  <div style="background: ${RM[r].light}; border: 1px solid ${RM[r].c}50; border-radius: 8px; padding: 7px 16px; display: flex; align-items: center; gap: 7px;">
+                    <div style="width: 8px; height: 8px; border-radius: 50%; background: ${RM[r].c};"></div>
+                    <span style="font-weight: 700; color: ${RM[r].c}; font-size: 14px;">${riskCounts[r]} ${r}</span>
+                  </div>
+                `).join('')}
+                <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 7px 16px;">
+                  <span style="font-weight: 700; color: #6b7280; font-size: 14px;">${form.findings.length} Total Findings</span>
+                </div>
+              </div>
+              ${form.executiveSummary ? `<div style="margin-bottom: 32px;"><h2 style="font-size: 18px; font-weight: 700; color: #111827; margin: 0 0 16px; padding-bottom: 12px; border-bottom: 2px solid #e5e7eb; display: flex; align-items: center; gap: 10px;"><span style="background: #1d4ed8; color: #fff; border-radius: 6px; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800;">1</span>Executive Summary</h2><div style="background: #f8fafc; border-left: 4px solid #3b82f6; border-radius: 0 8px 8px 0; padding: 16px 20px;"><p style="color: #374151; line-height: 1.8; margin: 0; font-size: 15px;">${form.executiveSummary}</p></div></div>` : ''}
+              ${(form.scope || form.tools) ? `<div style="margin-bottom: 32px;"><h2 style="font-size: 18px; font-weight: 700; color: #111827; margin: 0 0 16px; padding-bottom: 12px; border-bottom: 2px solid #e5e7eb; display: flex; align-items: center; gap: 10px;"><span style="background: #1d4ed8; color: #fff; border-radius: 6px; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800;">2</span>Scope & Methodology</h2><div style="display: grid; grid-template-columns: ${form.scope && form.tools ? '1fr 1fr' : '1fr'}; gap: 24px;">${form.scope ? `<div><h3 style="font-size: 13px; font-weight: 700; color: #374151; margin: 0 0 8px; text-transform: uppercase; letter-spacing: .06em;">Assessment Scope</h3><p style="color: #4b5563; line-height: 1.7; margin: 0; font-size: 14px;">${form.scope}</p></div>` : ''}${form.tools ? `<div><h3 style="font-size: 13px; font-weight: 700; color: #374151; margin: 0 0 10px; text-transform: uppercase; letter-spacing: .06em;">Tools & Techniques</h3><div style="display: flex; flex-wrap: wrap; gap: 6px;">${form.tools.split(',').map(t => `<span style="background: #dbeafe; color: #1d4ed8; border-radius: 6px; padding: 4px 10px; font-size: 12px; font-weight: 600;">${t.trim()}</span>`).join('')}</div></div>` : ''}</div></div>` : ''}
+              <div style="margin-bottom: 32px;"><h2 style="font-size: 18px; font-weight: 700; color: #111827; margin: 0 0 16px; padding-bottom: 12px; border-bottom: 2px solid #e5e7eb; display: flex; align-items: center; gap: 10px;"><span style="background: #1d4ed8; color: #fff; border-radius: 6px; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800;">3</span>Detailed Findings</h2><div id="findings-preview-list"></div></div>
+              <div><h2 style="font-size: 18px; font-weight: 700; color: #111827; margin: 0 0 16px; padding-bottom: 12px; border-bottom: 2px solid #e5e7eb; display: flex; align-items: center; gap: 10px;"><span style="background: #1d4ed8; color: #fff; border-radius: 6px; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800;">4</span>Risk Classification Summary</h2>
+              <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                <thead><tr style="background: #f9fafb;"><th style="padding: 12px 18px; text-align: left; color: #6b7280; font-weight: 700; font-size: 11px; text-transform: uppercase;">Risk Level</th><th style="padding: 12px 18px; text-align: left; color: #6b7280; font-weight: 700; font-size: 11px; text-transform: uppercase;">Count</th><th style="padding: 12px 18px; text-align: left; color: #6b7280; font-weight: 700; font-size: 11px; text-transform: uppercase;">Remediation Timeline</th></tr></thead>
+                <tbody>${RISKS.map((r, i) => `<tr style="border-bottom: 1px solid #f3f4f6; background: ${i % 2 === 0 ? '#fff' : '#fafafa'};"><td style="padding: 12px 18px;"><span style="background: ${RM[r].light}; color: ${RM[r].c}; border-radius: 6px; padding: 4px 12px; font-size: 13px; font-weight: 700;">${r}</span></td><td style="padding: 12px 18px; font-weight: 800; color: ${riskCounts[r] > 0 ? RM[r].c : '#9ca3af'}; font-size: 20px;">${riskCounts[r]}</td><td style="padding: 12px 18px; color: #6b7280; font-size: 13px;">${RDESC[r]}</td></tr>`).join('')}</tbody>
+              </table></div>
+              <div style="border-top: 2px solid #e5e7eb; padding-top: 20px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; color: #9ca3af; font-size: 12px;"><span style="font-weight: 700; color: #6b7280;">🛡️ CyberReport Pro</span><span style="font-style: italic;">CONFIDENTIAL — For Authorized Personnel Only</span><span>${form.date || new Date().toLocaleDateString()}</span></div>
+            </div>
+          </div>
+        `;
+
+        if (mainContent) {
+          mainContent.innerHTML = previewHtml;
+          
+          // Llenar la lista de hallazgos en el preview
+          const findingsPreviewList = document.querySelector('#findings-preview-list');
+          if (findingsPreviewList) {
+            findingsPreviewList.innerHTML = '';
+            form.findings.forEach((fn, i) => {
+              const m = RM[fn.risk];
+              findingsPreviewList.innerHTML += `
+                <div style="border: 1px solid ${m.c}30; border-radius: 10px; overflow: hidden; margin-bottom: 20px;">
+                  <div style="background: ${m.c}10; border-bottom: 1px solid ${m.c}25; padding: 14px 22px; display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; gap: 12px; align-items: center;"><span style="width: 28px; height: 28px; background: ${m.c}; border-radius: 7px; display: inline-flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; font-weight: 800;">${i+1}</span><span style="font-weight: 700; font-size: 15px; color: #111827;">${fn.title || `Unnamed Finding #${i+1}`}</span></div>
+                    <span style="background: ${m.c}; color: #fff; border-radius: 6px; padding: 4px 14px; font-size: 11px; font-weight: 800; text-transform: uppercase;">${fn.risk}</span>
+                  </div>
+                  <div style="padding: 18px 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; background: #fff;">
+                    ${fn.description ? `<div><div style="font-size: 10px; font-weight: 800; text-transform: uppercase; color: #9ca3af; margin-bottom: 6px;">Description</div><p style="margin: 0; color: #4b5563; font-size: 14px; line-height: 1.7;">${fn.description}</p></div>` : ''}
+                    ${fn.impact ? `<div><div style="font-size: 10px; font-weight: 800; text-transform: uppercase; color: #9ca3af; margin-bottom: 6px;">Business Impact</div><p style="margin: 0; color: #4b5563; font-size: 14px; line-height: 1.7;">${fn.impact}</p></div>` : ''}
+                    ${fn.recommendation ? `<div style="grid-column: span 2;"><div style="font-size: 10px; font-weight: 800; text-transform: uppercase; color: #9ca3af; margin-bottom: 6px;">Recommendation</div><p style="margin: 0; color: #4b5563; font-size: 14px; line-height: 1.7;">${fn.recommendation}</p></div>` : ''}
+                  </div>
+                </div>
+              `;
+            });
+          }
+          
+          const previewExportBtn = document.querySelector('#preview-export-btn');
+          if (previewExportBtn) {
+            previewExportBtn.onclick = () => {
+              const style = document.createElement('style');
+              style.id = '__cpr__';
+              style.textContent = `@media print { body * { visibility: hidden !important; } #print-report, #print-report * { visibility: visible !important; } #print-report { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; background: #fff !important; box-shadow: none !important; border-radius: 0 !important; } }`;
+              document.head.appendChild(style);
+              window.print();
+              setTimeout(() => {
+                const el = document.getElementById('__cpr__');
+                if (el) el.remove();
+              }, 2000);
+            };
+          }
+        }
+      };
+
+      const render = () => {
         appContainer.innerHTML = `
           <nav style="background: #1e293b; border-bottom: 1px solid #334155; padding: 0 28px; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 20px #00000050;">
             <div style="display: flex; align-items: center; gap: 12px;">
@@ -478,28 +480,18 @@
               <button id="logout-btn" style="background: #450a0a; border: 1px solid #dc2626; border-radius: 8px; padding: 7px 16px; color: #fca5a5; font-size: 13px; font-weight: 700; cursor: pointer;">Logout</button>
             </div>
           </nav>
-          <main style="padding: 28px 32px; max-width: 1000px; margin: 0 auto;">
-            <div id="main-content"></div>
-          </main>
+          <main style="padding: 28px 32px; max-width: 1000px; margin: 0 auto;"><div id="main-content"></div></main>
         `;
 
-        const mainContent = appContainer.querySelector('#main-content');
+        mainContent = appContainer.querySelector('#main-content');
+        
         if (tab === 'form') {
-          mainContent.innerHTML = '';
-          mainContent.appendChild(renderFormSection(form, (newForm) => { form = newForm; render(); }));
+          renderFullForm();
         } else {
-          mainContent.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-              <div><h2 style="color: #f1f5f9; margin: 0; font-size: 16px; font-weight: 700;">📄 Report Preview</h2><p style="color: #64748b; margin: 4px 0 0; font-size: 13px;">This is how your report will look when exported.</p></div>
-              <button id="preview-export-btn" style="background: #16a34a; border: none; border-radius: 8px; padding: 10px 24px; color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px;">📄 Export as PDF</button>
-            </div>
-          `;
-          mainContent.appendChild(renderReportPreview(form));
-          const previewExport = mainContent.querySelector('#preview-export-btn');
-          if (previewExport) previewExport.onclick = () => triggerPrint();
+          renderPreview();
         }
 
-        // Bind buttons
+        // Bind de navegación
         appContainer.querySelector('#tab-form').onclick = () => { tab = 'form'; render(); };
         appContainer.querySelector('#tab-preview').onclick = () => { tab = 'preview'; render(); };
         appContainer.querySelector('#reset-form').onclick = () => {
@@ -515,24 +507,24 @@
           if (tab !== 'preview') {
             tab = 'preview';
             render();
-            setTimeout(triggerPrint, 200);
+            setTimeout(() => {
+              const style = document.createElement('style');
+              style.id = '__cpr__';
+              style.textContent = `@media print { body * { visibility: hidden !important; } #print-report, #print-report * { visibility: visible !important; } #print-report { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; background: #fff !important; } }`;
+              document.head.appendChild(style);
+              window.print();
+              setTimeout(() => document.getElementById('__cpr__')?.remove(), 2000);
+            }, 200);
           } else {
-            triggerPrint();
+            const style = document.createElement('style');
+            style.id = '__cpr__';
+            style.textContent = `@media print { body * { visibility: hidden !important; } #print-report, #print-report * { visibility: visible !important; } #print-report { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; background: #fff !important; } }`;
+            document.head.appendChild(style);
+            window.print();
+            setTimeout(() => document.getElementById('__cpr__')?.remove(), 2000);
           }
         };
         appContainer.querySelector('#logout-btn').onclick = onLogout;
-      };
-
-      const triggerPrint = () => {
-        const style = document.createElement('style');
-        style.id = '__cpr__';
-        style.textContent = `@media print { body * { visibility: hidden !important; } #print-report, #print-report * { visibility: visible !important; } #print-report { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; background: #fff !important; box-shadow: none !important; border-radius: 0 !important; } }`;
-        document.head.appendChild(style);
-        window.print();
-        setTimeout(() => {
-          const el = document.getElementById('__cpr__');
-          if (el) el.remove();
-        }, 2000);
       };
 
       render();
@@ -565,7 +557,6 @@
         }
       };
 
-      // Toast listener
       window.addEventListener('showToast', (e) => {
         const toastDiv = document.createElement('div');
         toastDiv.style.cssText = 'position: fixed; bottom: 24px; right: 24px; background: #16a34a; color: #fff; border-radius: 10px; padding: 12px 20px; font-size: 14px; font-weight: 600; z-index: 9999; box-shadow: 0 8px 24px #00000050;';
@@ -581,4 +572,3 @@
   </script>
 </body>
 </html>
-
